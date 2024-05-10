@@ -1,3 +1,5 @@
+use openlight::xdg;
+
 pub fn main() {
-    println!("Hello, world!");    
+    let apps = xdg::get_applications();
 }
