@@ -1,3 +1,4 @@
+use xdgkit::desktop_entry::{DesktopType, DesktopEntry};
 use std::{env, fs};
 use std::path::PathBuf;
 
@@ -82,16 +83,23 @@ fn read_desktop_files(files: Vec<PathBuf>) -> Vec<String> {
     return data;
 }
 
-fn parse_desktop_entries(file_data: Vec<String>) -> Vec<String> {
-    // TODO: Parse entries
+fn parse_files(files: Vec<String>) -> Vec<DesktopEntry> {
+    return files
+            .into_iter()
+            .map(|f| DesktopEntry::read(f))
+            .collect();
+}
+
+fn parse_desktop_entries(entries: Vec<DesktopEntry>) -> Vec<Application> {
     Vec::new()
 }
 
 pub fn get_applications() -> Vec<Application> {
     let dirs = get_desktop_dirs();
     let files = scan_desktop_files(dirs);
-    let data = read_desktop_files(files);
-    let desktop_entries = parse_desktop_entries(data);
+    let file_data = read_desktop_files(files);
+    let desktop_entries = parse_files(file_data);
+    let applications = parse_desktop_entries(desktop_entries);
 
-    return Vec::new();
+    return applications;
 }
