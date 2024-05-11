@@ -1,12 +1,9 @@
+use crate::application::Application;
 use xdgkit::desktop_entry::DesktopEntry;
 use std::{env, fs};
 use std::path::PathBuf;
 
 use walkdir::WalkDir;
-
-pub struct Application {
-    title: String
-}
 
 // taken from fuzzel:
 // https://codeberg.org/dnkl/fuzzel/src/branch/master/xdg.c
@@ -76,23 +73,26 @@ fn read_desktop_files(files: Vec<PathBuf>) -> Vec<String> {
             .collect();
 }
 
-fn parse_file_data(data: Vec<String>) -> Vec<DesktopEntry> {
+fn parse_desktop_entries(data: Vec<String>) -> Vec<DesktopEntry> {
     return data
             .into_iter()
             .map(|f| DesktopEntry::read(f))
             .collect();
 }
 
-fn parse_desktop_entries(entries: Vec<DesktopEntry>) -> Vec<Application> {
-    Vec::new()
+fn generate_applications(entries: Vec<DesktopEntry>) -> Vec<Application> {
+    return entries
+        .into_iter()
+        .filter_map(|e| Application::try_from(e).ok())
+        .collect();
 }
 
 pub fn get_applications() -> Vec<Application> {
     let dirs = get_desktop_dirs();
     let files = scan_desktop_files(dirs);
     let file_data = read_desktop_files(files);
-    let desktop_entries = parse_file_data(file_data);
-    let applications = parse_desktop_entries(desktop_entries);
+    let desktop_entries = parse_desktop_entries(file_data);
+    let applications = generate_applications(desktop_entries);
 
     return applications;
 }
