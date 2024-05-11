@@ -1,4 +1,4 @@
-use xdgkit::desktop_entry::{DesktopType, DesktopEntry};
+use xdgkit::desktop_entry::DesktopEntry;
 use std::{env, fs};
 use std::path::PathBuf;
 
@@ -13,9 +13,8 @@ pub struct Application {
 fn get_desktop_dirs() -> Vec<PathBuf> {
     let mut dirs = Vec::new();
 
-    let data_home = env::var("XDG_DATA_HOME").ok();
-    if data_home.is_some() {
-        let data_home = PathBuf::from(data_home.unwrap());
+    if let Ok(data_home) = env::var("XDG_DATA_HOME") {
+        let data_home = PathBuf::from(data_home);
         if data_home.exists() {
             dirs.push(data_home);
         }
@@ -28,10 +27,9 @@ fn get_desktop_dirs() -> Vec<PathBuf> {
         }
     }
 
-    let xdg_data_dirs = env::var("XDG_DATA_DIRS").ok();
-    if xdg_data_dirs.is_some() {
+    if let Ok(xdg_data_dirs) = env::var("XDG_DATA_DIRS") {
         dirs.extend(
-            xdg_data_dirs.unwrap()
+            xdg_data_dirs
             .split(":")
             .map(|s| PathBuf::from(s))
             .filter(|d| d.exists())
@@ -72,19 +70,14 @@ fn scan_desktop_files(dirs: Vec<PathBuf>) -> Vec<PathBuf> {
 }
 
 fn read_desktop_files(files: Vec<PathBuf>) -> Vec<String> {
-    let mut data = Vec::new();
-
-    for path in files {
-        if let Ok(file) = fs::read_to_string(path) {
-            data.push(file);
-        }
-    }
-
-    return data;
+    return files
+            .into_iter()
+            .filter_map(|path| fs::read_to_string(path).ok())
+            .collect();
 }
 
-fn parse_files(files: Vec<String>) -> Vec<DesktopEntry> {
-    return files
+fn parse_file_data(data: Vec<String>) -> Vec<DesktopEntry> {
+    return data
             .into_iter()
             .map(|f| DesktopEntry::read(f))
             .collect();
@@ -98,7 +91,7 @@ pub fn get_applications() -> Vec<Application> {
     let dirs = get_desktop_dirs();
     let files = scan_desktop_files(dirs);
     let file_data = read_desktop_files(files);
-    let desktop_entries = parse_files(file_data);
+    let desktop_entries = parse_file_data(file_data);
     let applications = parse_desktop_entries(desktop_entries);
 
     return applications;
