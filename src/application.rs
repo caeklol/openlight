@@ -7,7 +7,7 @@ pub struct Application {
     exec: String,
     exec_path: Option<PathBuf>,
     desc: Option<String>,
-    class: Option<String>
+    class: Option<String>,
 }
 
 impl TryFrom<DesktopEntry> for Application {
@@ -23,7 +23,7 @@ impl TryFrom<DesktopEntry> for Application {
                 path = Some(path_buf);
             }
         }
-            
+
         return Ok(Application {
             name: value.name.ok_or("No name")?,
             exec: value.exec.ok_or("No exec")?,

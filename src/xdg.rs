@@ -1,7 +1,7 @@
 use crate::application::Application;
-use xdgkit::desktop_entry::DesktopEntry;
-use std::{env, fs};
 use std::path::PathBuf;
+use std::{env, fs};
+use xdgkit::desktop_entry::DesktopEntry;
 
 use walkdir::WalkDir;
 
@@ -27,9 +27,9 @@ fn get_desktop_dirs() -> Vec<PathBuf> {
     if let Ok(xdg_data_dirs) = env::var("XDG_DATA_DIRS") {
         dirs.extend(
             xdg_data_dirs
-            .split(":")
-            .map(|s| PathBuf::from(s))
-            .filter(|d| d.exists())
+                .split(":")
+                .map(|s| PathBuf::from(s))
+                .filter(|d| d.exists()),
         );
     } else {
         let usr_local_share = PathBuf::from("/usr/local/share");
@@ -54,10 +54,12 @@ fn scan_desktop_files(dirs: Vec<PathBuf>) -> Vec<PathBuf> {
         for entry in walker {
             if let Ok(entry) = entry {
                 if entry
-                .path().extension()
-                .and_then(|ext| Some(ext == "desktop"))
-                .unwrap_or(false) {
-                   files.push(entry.path().to_path_buf()); 
+                    .path()
+                    .extension()
+                    .and_then(|ext| Some(ext == "desktop"))
+                    .unwrap_or(false)
+                {
+                    files.push(entry.path().to_path_buf());
                 }
             }
         }
@@ -68,16 +70,13 @@ fn scan_desktop_files(dirs: Vec<PathBuf>) -> Vec<PathBuf> {
 
 fn read_desktop_files(files: Vec<PathBuf>) -> Vec<String> {
     return files
-            .into_iter()
-            .filter_map(|path| fs::read_to_string(path).ok())
-            .collect();
+        .into_iter()
+        .filter_map(|path| fs::read_to_string(path).ok())
+        .collect();
 }
 
 fn parse_desktop_entries(data: Vec<String>) -> Vec<DesktopEntry> {
-    return data
-            .into_iter()
-            .map(|f| DesktopEntry::read(f))
-            .collect();
+    return data.into_iter().map(|f| DesktopEntry::read(f)).collect();
 }
 
 fn generate_applications(entries: Vec<DesktopEntry>) -> Vec<Application> {
