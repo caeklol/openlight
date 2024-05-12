@@ -1,3 +1,4 @@
+use crate::xdg;
 use std::path::PathBuf;
 use xdgkit::desktop_entry::DesktopEntry;
 
@@ -32,4 +33,13 @@ impl TryFrom<DesktopEntry> for Application {
             class: value.generic_name,
         });
     }
+}
+
+pub fn get_applications() -> Vec<Application> {
+    let mut final_list = Vec::new();
+
+    // add more sources here!
+    final_list.extend(xdg::get_applications());
+
+    return final_list;
 }

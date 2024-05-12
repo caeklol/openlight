@@ -1,6 +1,4 @@
-use openlight::xdg;
+use openlight::provider;
 
 pub fn main() {
-    let apps = xdg::get_applications();
-    println!("{:?}", apps);
 }

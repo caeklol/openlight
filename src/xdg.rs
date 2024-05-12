@@ -1,4 +1,4 @@
-use crate::application::Application;
+use crate::provider::Application;
 use std::path::PathBuf;
 use std::{env, fs};
 use xdgkit::desktop_entry::DesktopEntry;
