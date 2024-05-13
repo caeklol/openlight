@@ -2,6 +2,9 @@ use crate::xdg;
 use std::path::PathBuf;
 use xdgkit::desktop_entry::DesktopEntry;
 
+use norm::fzf::{FzfParser, FzfV2};
+use norm::Metric;
+
 #[derive(Debug)]
 pub struct Application {
     name: String,
@@ -35,7 +38,7 @@ impl TryFrom<DesktopEntry> for Application {
     }
 }
 
-pub fn get_applications() -> Vec<Application> {
+fn get_applications() -> Vec<Application> {
     let mut final_list = Vec::new();
 
     // add more sources here!
@@ -43,3 +46,33 @@ pub fn get_applications() -> Vec<Application> {
 
     return final_list;
 }
+
+pub struct Provider {
+    applications: Vec<Application>
+}
+
+impl Provider {
+    pub fn init() -> Self {
+        return Self {
+            applications: get_applications(),
+        };
+    }
+
+    pub fn find(&self, query: &str) -> Vec<&Application> {
+        let mut fzf = FzfV2::new();
+        let mut parser = FzfParser::new();
+
+        let query = parser.parse(query);
+
+        let mut results = self.applications
+            .iter()
+            .filter_map(|entry| fzf.distance(query, &entry.name).map(|dist| (entry, dist)))
+            .collect::<Vec<_>>();
+
+        results.sort_by_key(|(_, dist)| *dist);
+
+        return results.into_iter().map(|(entry, _)| entry).collect::<Vec<_>>()
+    }
+}
+
+
