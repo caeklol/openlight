@@ -3,5 +3,6 @@ use openlight::view::View;
 
 pub fn main() {
     let provider = Provider::init();
-    println!("{:?}", provider.find("Disc"));
+    let view = View::init(provider);
+    view.start();
 }

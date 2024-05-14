@@ -7,6 +7,5 @@ edition = "2021"
 
 [dependencies]
 norm = { version = "0.1.1", features = ["fzf-v2"] }
-raylib = "3.7.0"
 walkdir = "2.5.0"
 xdgkit = "3.2.5"
