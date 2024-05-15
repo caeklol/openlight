@@ -1,6 +1,2 @@
-# openlight
-
-An application launcher for tiling window managers \
-written in Rust™ \
-
-### WIP
+# ABANDONED
+In favor of [Loungy](https://github.com/MatthiasGrandl/Loungy)
